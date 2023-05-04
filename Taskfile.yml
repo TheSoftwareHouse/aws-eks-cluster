@@ -1,0 +1,25 @@
+# https://taskfile.dev
+version: "3"
+env:
+  TF_PLUGIN_CACHE_DIR: "{{ .HOME }}/.terraform.d/"
+tasks:
+  cleanup:
+    desc: Cleanup Terraform Cache
+    cmds:
+      - find . -name ".terraform" -type d -exec rm -rf {} +
+      - find . -name ".terraform.lock.hcl" -type f -exec rm -f {} +
+      - rm -rf $TF_PLUGIN_CACHE_DIR/.terraform.d/*
+
+  install:
+    desc: Install Terragrunt & Terraform Version Manager & Support Tools
+    cmds:
+      - brew install asdf direnv pre-commit tfsec checkov minamijoyo/tfupdate/tfupdate
+      - asdf plugin-list | grep -q terraform || asdf plugin-add terraform https://github.com/asdf-community/asdf-hashicorp.git
+      - asdf plugin-list | grep -q terragrunt || asdf plugin-add terragrunt https://github.com/ohmer/asdf-terragrunt
+      - asdf install
+      - pre-commit install
+
+  pre-commit:
+    desc: Run Pre-Commit On All Files
+    cmds:
+      - pre-commit run --all-files
