@@ -20,7 +20,7 @@ locals {
   karpenter_irsa_name = "KarpenterIRSA-${var.cluster_name}"
   karpenter_aws_auth_role = var.enable_karpenter ? [
     {
-      rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.id}:role/${local.karpenter_irsa_name}"
+      rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.karpenter_irsa_name}"
       username = "system:node:{{EC2PrivateDNSName}}"
       groups   = ["system:bootstrappers", "system:nodes"]
     }
