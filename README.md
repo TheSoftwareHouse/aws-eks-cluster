@@ -7,9 +7,11 @@ Consists of
 
 # Tooling
 
-Taskfile :muscle:
-ASDF
-Pre-Commit
+- Taskfile :muscle:
+
+- ASDF
+
+- Pre-Commit
 
 ```
 task install
