@@ -122,7 +122,7 @@ module "eks" {
   kms_key_description     = "KMS Key for Kubernetes Secrets Encryption"
 
   # aws-auth configmap
-  manage_aws_auth_configmap = false
+  manage_aws_auth_configmap = true
   aws_auth_roles            = flatten(concat(local.karpenter_aws_auth_role, var.aws_auth_roles))
 
   ## Tags
