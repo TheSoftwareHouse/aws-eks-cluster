@@ -1,34 +1,34 @@
 output "cluster_name" {
   value       = module.eks.cluster_name
-  description = "EKS cluster name"
+  description = "EKS Cluster Name"
 }
 
 output "cluster_endpoint" {
   value       = module.eks.cluster_endpoint
-  description = "EKS cluster endpoint"
+  description = "EKS Cluster Endpoint"
 }
 
 output "eks_managed_node_group_labels" {
   value       = { for k, v in module.eks.eks_managed_node_groups : k => v.node_group_labels }
-  description = "EKS node group labels"
+  description = "EKS Node Group Labels"
 }
 
 output "eks_managed_node_group_ids" {
   value       = [for k in module.eks.eks_managed_node_groups : k.node_group_id]
-  description = "EKS node group ids"
+  description = "EKS Node Group IDs"
 }
 
 output "karpenter_irsa_arn" {
   value       = module.karpenter[0].irsa_arn
-  description = "Karpenter IRSA role ARN"
+  description = "Karpenter IRSA Role ARN"
 }
 
 output "karpenter_queue_name" {
   value       = module.karpenter[0].queue_name
-  description = "Karpenter SNS Queue name"
+  description = "Karpenter SQS Queue Name"
 }
 
 output "irsa_arns" {
   value       = { for k, v in module.iam_role_for_service_account : k => v.iam_role_arn }
-  description = "IRSA roles ARNs"
+  description = "IRSA Roles ARNs"
 }
