@@ -60,25 +60,20 @@ module "eks" {
   }
 
   eks_managed_node_groups = {
-    staging-ng = {
-      name            = "${var.cluster_name}-staging-ng"
-      use_name_prefix = false
-      min_size        = lookup(var.eks_staging_node_group, "min_size", 3)
-      max_size        = lookup(var.eks_staging_node_group, "max_size", 3)
-      desired_size    = lookup(var.eks_staging_node_group, "desired_size", 3)
-      capacity_type   = lookup(var.eks_staging_node_group, "capacity_type", "SPOT")
-      instance_types  = lookup(var.eks_staging_node_group, "instance_types", ["t3.medium"])
-      create_iam_role = false
-      iam_role_arn    = "arn:aws:iam::${data.aws_caller_identity.current.id}:role/${var.cluster_name}-EKSNodeGroupsRole"
+    spot = {
+      min_size     = 3
+      max_size     = 3
+      desired_size = 3
 
-      labels = {
-        "environment" = "staging"
-      }
+      instance_types = ["t3.medium"]
+      capacity_type  = "SPOT"
 
-      tags = merge(
-        var.tags,
-        lookup(var.eks_staging_node_group, "tags", {})
-      )
+      iam_role_additional_policies = [
+        "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+        "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+        "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      ]
     }
   }
 
