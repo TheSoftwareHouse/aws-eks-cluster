@@ -13,7 +13,7 @@ module "karpenter" {
   irsa_use_name_prefix    = false
   create_instance_profile = true
   create_iam_role         = false
-  iam_role_arn            = module.eks.eks_managed_node_groups["staging-ng"].iam_role_arn
+  iam_role_arn            = module.eks.eks_managed_node_groups["spot"].iam_role_arn
 
   tags = merge(
     var.tags
