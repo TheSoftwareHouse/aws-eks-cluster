@@ -63,9 +63,9 @@ module "eks" {
     production-ng = {
       name                     = "${var.cluster_name}-production-ng"
       use_name_prefix          = false
-      min_size                 = lookup(var.eks_production_node_group, "min_size", 1)
-      max_size                 = lookup(var.eks_production_node_group, "max_size", 2)
-      desired_size             = lookup(var.eks_production_node_group, "desired_size", 1)
+      min_size                 = lookup(var.eks_production_node_group, "min_size", 0)
+      max_size                 = lookup(var.eks_production_node_group, "max_size", 0)
+      desired_size             = lookup(var.eks_production_node_group, "desired_size", 0)
       capacity_type            = lookup(var.eks_production_node_group, "capacity_type", "ON_DEMAND")
       instance_types           = lookup(var.eks_production_node_group, "instance_types", ["t3.medium"])
       create_iam_role          = true
@@ -89,9 +89,9 @@ module "eks" {
     staging-ng = {
       name            = "${var.cluster_name}-staging-ng"
       use_name_prefix = false
-      min_size        = lookup(var.eks_staging_node_group, "min_size", 1)
-      max_size        = lookup(var.eks_staging_node_group, "max_size", 1)
-      desired_size    = lookup(var.eks_staging_node_group, "desired_size", 1)
+      min_size        = lookup(var.eks_staging_node_group, "min_size", 3)
+      max_size        = lookup(var.eks_staging_node_group, "max_size", 3)
+      desired_size    = lookup(var.eks_staging_node_group, "desired_size", 3)
       capacity_type   = lookup(var.eks_staging_node_group, "capacity_type", "SPOT")
       instance_types  = lookup(var.eks_staging_node_group, "instance_types", ["t3.medium"])
       create_iam_role = false
