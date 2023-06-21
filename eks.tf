@@ -79,7 +79,7 @@ module "eks" {
       }
 
       labels = {
-        "environment" = "production"
+        "environment" = "spot"
       }
 
       tags = merge(
