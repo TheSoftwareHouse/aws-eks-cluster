@@ -61,19 +61,31 @@ module "eks" {
 
   eks_managed_node_groups = {
     spot = {
-      min_size     = 3
-      max_size     = 3
-      desired_size = 3
+      min_size                 = 3
+      max_size                 = 3
+      desired_size             = 3
+      instance_types           = ["t3.medium"]
+      capacity_type            = "SPOT"
+      create_iam_role          = true
+      iam_role_use_name_prefix = false
+      iam_role_name            = "${var.cluster_name}-EKSNodeGroupsRole"
 
-      instance_types = ["t3.medium"]
-      capacity_type  = "SPOT"
+      iam_role_additional_policies = {
+        ElasticLoadBalancingReadOnly       = "arn:aws:iam::aws:policy/ElasticLoadBalancingReadOnly",
+        AmazonEKSWorkerNodePolicy          = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+        AmazonEKS_CNI_Policy               = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+        AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+        AmazonSSMManagedInstanceCore       = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      }
 
-      iam_role_additional_policies = [
-        "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
-        "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
-        "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
-        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-      ]
+      labels = {
+        "environment" = "production"
+      }
+
+      tags = merge(
+        var.tags,
+        lookup(var.eks_production_node_group, "tags", {})
+      )
     }
   }
 
