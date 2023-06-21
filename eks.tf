@@ -64,7 +64,7 @@ module "eks" {
       name                     = "${var.cluster_name}-production-ng"
       use_name_prefix          = false
       min_size                 = lookup(var.eks_production_node_group, "min_size", 0)
-      max_size                 = lookup(var.eks_production_node_group, "max_size", 0)
+      max_size                 = lookup(var.eks_production_node_group, "max_size", 1)
       desired_size             = lookup(var.eks_production_node_group, "desired_size", 0)
       capacity_type            = lookup(var.eks_production_node_group, "capacity_type", "ON_DEMAND")
       instance_types           = lookup(var.eks_production_node_group, "instance_types", ["t3.medium"])
