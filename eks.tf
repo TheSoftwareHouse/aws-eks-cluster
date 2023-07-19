@@ -123,13 +123,13 @@ locals {
 
   aws_load_balancer_controller_irsa_role = var.enable_aws_load_balancer_controller && var.create_aws_load_balancer_controller_irsa_role ? [{
     name                                   = "aws-load-balancer-controller"
-    namespace                              = "kube-system"
+    namespace                              = "aws-load-balancer-controller"
     attach_load_balancer_controller_policy = true
   }] : []
 
   external_dns_irsa_role = var.enable_external_dns && var.create_external_dns_irsa_role ? [{
     name                       = "external-dns"
-    namespace                  = "kube-system"
+    namespace                  = "external-dns"
     attach_external_dns_policy = true
   }] : []
 
