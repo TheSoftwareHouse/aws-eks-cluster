@@ -1,5 +1,3 @@
-data "aws_caller_identity" "current" {}
-
 locals {
   eks_addons = {
     coredns = {
@@ -94,26 +92,23 @@ module "eks" {
   node_security_group_name    = "${var.cluster_name}-node-sg"
 
   ## KMS
-  create_kms_key          = true
-  enable_kms_key_rotation = true
-  kms_key_owners          = var.kms_key_owners
-  kms_key_administrators  = var.kms_key_administrators
-  kms_key_service_users   = var.kms_key_service_users
-  kms_key_users           = var.kms_key_users
-  kms_key_description     = "KMS Key for Kubernetes Secrets Encryption"
-
-  # aws-auth configmap
+  create_kms_key            = true
+  enable_kms_key_rotation   = true
+  kms_key_owners            = var.kms_key_owners
+  kms_key_administrators    = var.kms_key_administrators
+  kms_key_service_users     = var.kms_key_service_users
+  kms_key_users             = var.kms_key_users
+  kms_key_description       = "KMS Key for Kubernetes Secrets Encryption"
   manage_aws_auth_configmap = true
   aws_auth_roles            = flatten(concat(local.karpenter_aws_auth_role, var.aws_auth_roles))
 
-  ## Tags
   cluster_security_group_tags = var.cluster_security_group_tags
   node_security_group_tags    = merge(var.node_security_group_tags, local.karpenter_node_security_group_tags)
   cluster_tags                = var.cluster_tags
   tags                        = var.tags
 }
 
-## IRSA roles
+# IRSA Roles
 locals {
   aws_ebs_csi_driver_irsa_role = var.enable_aws_ebs_csi_driver && var.create_aws_ebs_csi_driver_irsa_role ? [{
     name                  = "ebs-csi-controller-sa"
