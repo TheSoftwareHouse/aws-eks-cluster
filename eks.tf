@@ -7,7 +7,15 @@ locals {
       most_recent = true
     }
     vpc-cni = {
-      most_recent = true
+      most_recent    = true
+      before_compute = true
+      configuration_values = jsonencode({
+        env = {
+          # Reference docs https://docs.aws.amazon.com/eks/latest/userguide/cni-increase-ip-addresses.html
+          ENABLE_PREFIX_DELEGATION = "true"
+          WARM_PREFIX_TARGET       = "1"
+        }
+      })
     }
     aws-ebs-csi-driver = {
       most_recent              = true
@@ -58,9 +66,9 @@ module "eks" {
   }
   eks_managed_node_groups = {
     spot = {
-      min_size                 = 3
-      max_size                 = 3
-      desired_size             = 3
+      min_size                 = 2
+      max_size                 = 2
+      desired_size             = 2
       instance_types           = ["t3.medium"]
       capacity_type            = "SPOT"
       create_iam_role          = true
@@ -74,6 +82,14 @@ module "eks" {
         AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
         AmazonSSMManagedInstanceCore       = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
       }
+
+      pre_bootstrap_user_data = <<-EOT
+        #!/bin/bash
+        LINE_NUMBER=$(grep -n "KUBELET_EXTRA_ARGS=\$2" /etc/eks/bootstrap.sh | cut -f1 -d:)
+        REPLACEMENT="\ \ \ \ \ \ KUBELET_EXTRA_ARGS=\$(echo \$2 | sed -s -E 's/--max-pods=[0-9]+/--max-pods=30/g')"
+        sed -i '/KUBELET_EXTRA_ARGS=\$2/d' /etc/eks/bootstrap.sh
+        sed -i "$${LINE_NUMBER}i $${REPLACEMENT}" /etc/eks/bootstrap.sh
+      EOT
 
       labels = {
         "environment" = "spot"
