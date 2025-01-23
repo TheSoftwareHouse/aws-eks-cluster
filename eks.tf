@@ -156,6 +156,10 @@ module "eks_auth" {
   aws_auth_roles            = flatten(concat(local.karpenter_aws_auth_role, var.aws_auth_roles))
 }
 
+moved {
+  from = module.eks.kubernetes_config_map_v1_data.aws_auth[0]
+  to   = module.eks_auth.kubernetes_config_map_v1_data.aws_auth[0]
+}
 
 module "iam_role_for_service_account" {
   for_each = local.irsa_roles
