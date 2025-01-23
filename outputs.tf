@@ -18,6 +18,10 @@ output "eks_managed_node_group_ids" {
   description = "EKS Node Group IDs"
 }
 
+output "karpenter_iam_role_arn" {
+  value = module.karpenter.iam_role_arn
+}
+
 output "karpenter_queue_name" {
   value       = module.karpenter[0].queue_name
   description = "Karpenter SQS Queue Name"
