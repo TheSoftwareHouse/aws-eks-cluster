@@ -149,11 +149,20 @@ locals {
 }
 
 
+locals {
+  aws_auth_eks_node_role = [
+    {
+      rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.id}:role/${var.cluster_name}-EKSNodeGroupsRole"
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups   = ["system:bootstrappers", "system:nodes"]
+    }
+  ]
+}
 module "eks_auth" {
   source                    = "terraform-aws-modules/eks/aws//modules/aws-auth"
   version                   = "20.26.1"
   manage_aws_auth_configmap = true
-  aws_auth_roles            = flatten(concat(local.karpenter_aws_auth_role, var.aws_auth_roles))
+  aws_auth_roles            = concat(local.aws_auth_eks_node_role, local.karpenter_aws_auth_role, var.aws_auth_roles)
 }
 
 moved {
