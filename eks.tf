@@ -154,7 +154,7 @@ locals {
 module "iam_role_for_service_account" {
   for_each = local.irsa_roles
   source   = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version  = "5.30.0"
+  version  = "5.52.2"
 
   role_name                              = "${each.value.name}IRSA-${var.cluster_name}"
   attach_load_balancer_controller_policy = lookup(each.value, "attach_load_balancer_controller_policy", false)
