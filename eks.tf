@@ -107,16 +107,13 @@ module "eks" {
   node_security_group_name    = "${var.cluster_name}-node-sg"
 
   ## KMS
-  create_kms_key            = true
-  enable_kms_key_rotation   = true
-  kms_key_owners            = var.kms_key_owners
-  kms_key_administrators    = var.kms_key_administrators
-  kms_key_service_users     = var.kms_key_service_users
-  kms_key_users             = var.kms_key_users
-  kms_key_description       = "KMS Key for Kubernetes Secrets Encryption"
-  manage_aws_auth_configmap = true
-  aws_auth_roles            = flatten(concat(local.karpenter_aws_auth_role, var.aws_auth_roles))
-
+  create_kms_key              = true
+  enable_kms_key_rotation     = true
+  kms_key_owners              = var.kms_key_owners
+  kms_key_administrators      = var.kms_key_administrators
+  kms_key_service_users       = var.kms_key_service_users
+  kms_key_users               = var.kms_key_users
+  kms_key_description         = "KMS Key for Kubernetes Secrets Encryption"
   cluster_security_group_tags = var.cluster_security_group_tags
   node_security_group_tags    = merge(var.node_security_group_tags, local.karpenter_node_security_group_tags)
   cluster_tags                = var.cluster_tags
@@ -150,6 +147,15 @@ locals {
     var.additional_irsa_roles
   )) : i.name => i }
 }
+
+
+module "eks_auth" {
+  source                    = "terraform-aws-modules/eks/aws//modules/aws-auth"
+  version                   = "20.26.1"
+  manage_aws_auth_configmap = true
+  aws_auth_roles            = flatten(concat(local.karpenter_aws_auth_role, var.aws_auth_roles))
+}
+
 
 module "iam_role_for_service_account" {
   for_each = local.irsa_roles

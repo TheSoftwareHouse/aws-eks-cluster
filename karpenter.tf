@@ -8,13 +8,15 @@ module "karpenter" {
   irsa_oidc_provider_arn          = module.eks.oidc_provider_arn
   irsa_namespace_service_accounts = ["karpenter:karpenter"]
 
-  create_irsa              = true
-  irsa_name                = "${var.cluster_name}-KarpenterIRSA"
-  irsa_use_name_prefix     = false
-  create_instance_profile  = true
-  create_iam_role          = false
+  enable_irsa             = true
+  create_instance_profile = true
+
+  iam_role_name            = "${var.cluster_name}-KarpenterIRSA"
+  iam_role_description     = "Karpenter IAM role for service account"
   iam_role_use_name_prefix = false
-  iam_role_arn             = module.eks.eks_managed_node_groups["spot"].iam_role_arn
+  iam_policy_name          = "KarpenterIRSA-${module.eks.cluster_name}"
+  iam_policy_description   = "Karpenter IAM role for service account"
+  create_iam_role          = false
 
   tags = merge(
     var.tags
