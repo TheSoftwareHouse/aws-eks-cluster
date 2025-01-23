@@ -19,7 +19,7 @@ output "eks_managed_node_group_ids" {
 }
 
 output "karpenter_iam_role_arn" {
-  value = module.karpenter.iam_role_arn
+  value = module.karpenter[0].iam_role_arn
 }
 
 output "karpenter_queue_name" {
