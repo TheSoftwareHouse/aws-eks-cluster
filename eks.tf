@@ -1,28 +1,4 @@
 locals {
-  eks_addons = {
-    coredns = {
-      most_recent = true
-    }
-    kube-proxy = {
-      most_recent = true
-    }
-    vpc-cni = {
-      most_recent    = true
-      before_compute = true
-      configuration_values = jsonencode({
-        env = {
-          # Reference docs https://docs.aws.amazon.com/eks/latest/userguide/cni-increase-ip-addresses.html
-          ENABLE_PREFIX_DELEGATION = "true"
-          WARM_PREFIX_TARGET       = "1"
-        }
-      })
-    }
-    aws-ebs-csi-driver = {
-      most_recent              = true
-      service_account_role_arn = var.create_aws_ebs_csi_driver_irsa_role ? "arn:aws:iam::${data.aws_caller_identity.current.id}:role/${local.aws_ebs_csi_driver_irsa_role[0].name}IRSA-${var.cluster_name}" : null # id konta do data
-    }
-  }
-
   karpenter_irsa_name = "KarpenterIRSA-${var.cluster_name}"
   karpenter_aws_auth_role = var.enable_karpenter ? [
     {
@@ -44,12 +20,25 @@ module "eks" {
   cluster_endpoint_public_access       = var.cluster_endpoint_public_access
   cluster_endpoint_public_access_cidrs = var.cluster_endpoint_public_access_cidrs
 
-  ## Addons
   cluster_addons = {
-    coredns            = var.enable_coredns ? local.eks_addons.coredns : null
-    kube-proxy         = var.enable_kube_proxy ? local.eks_addons.kube-proxy : null
-    vpc-cni            = var.enable_vpc_cni ? local.eks_addons.vpc-cni : null
-    aws-ebs-csi-driver = var.enable_aws_ebs_csi_driver ? local.eks_addons.aws-ebs-csi-driver : null
+    coredns    = { most_recent = true }
+    kube-proxy = { most_recent = true }
+    vpc-cni = {
+      most_recent    = true
+      before_compute = true
+      configuration_values = jsonencode({
+        env = {
+          ENABLE_PREFIX_DELEGATION = "true" # https://docs.aws.amazon.com/eks/latest/userguide/cni-increase-ip-addresses.html
+          WARM_PREFIX_TARGET       = "1"
+        }
+      })
+    }
+    aws-ebs-csi-driver = {
+      most_recent              = true
+      service_account_role_arn = var.create_aws_ebs_csi_driver_irsa_role ? "arn:aws:iam::${data.aws_caller_identity.current.id}:role/${local.aws_ebs_csi_driver_irsa_role[0].name}IRSA-${var.cluster_name}" : null
+    }
+    aws-efs-csi-driver     = { most_recent = true }
+    eks-pod-identity-agent = { most_recent = true }
   }
 
   ## VPC & Network
@@ -102,18 +91,16 @@ module "eks" {
     }
   }
 
-  ## Security Group
   cluster_security_group_name = "${var.cluster_name}-cluster-sg"
   node_security_group_name    = "${var.cluster_name}-node-sg"
 
-  ## KMS
   create_kms_key              = true
   enable_kms_key_rotation     = true
   kms_key_owners              = var.kms_key_owners
   kms_key_administrators      = var.kms_key_administrators
   kms_key_service_users       = var.kms_key_service_users
   kms_key_users               = var.kms_key_users
-  kms_key_description         = "KMS Key for Kubernetes Secrets Encryption"
+  kms_key_description         = "KMS Key For Kubernetes Secrets Encryption"
   cluster_security_group_tags = var.cluster_security_group_tags
   node_security_group_tags    = merge(var.node_security_group_tags, local.karpenter_node_security_group_tags)
   cluster_tags                = var.cluster_tags
@@ -158,16 +145,12 @@ locals {
     }
   ]
 }
+
 module "eks_auth" {
   source                    = "terraform-aws-modules/eks/aws//modules/aws-auth"
   version                   = "20.26.1"
   manage_aws_auth_configmap = true
   aws_auth_roles            = concat(local.aws_auth_eks_node_role, local.karpenter_aws_auth_role, var.aws_auth_roles)
-}
-
-moved {
-  from = module.eks.kubernetes_config_map_v1_data.aws_auth[0]
-  to   = module.eks_auth.kubernetes_config_map_v1_data.aws_auth[0]
 }
 
 module "iam_role_for_service_account" {
