@@ -8,6 +8,11 @@ output "cluster_endpoint" {
   description = "EKS Cluster Endpoint"
 }
 
+output "cluster_oidc_issuer_url" {
+  value = module.eks.cluster_oidc_issuer_url
+  description = "EKS Cluster OIDC Issuer URL"
+}
+
 output "eks_managed_node_group_labels" {
   value       = { for k, v in module.eks.eks_managed_node_groups : k => v.node_group_labels }
   description = "EKS Node Group Labels"
