@@ -4,7 +4,7 @@ variable "cluster_name" {
 
 variable "cluster_version" {
   type    = string
-  default = "1.25"
+  default = "1.31"
 }
 
 variable "cluster_endpoint_public_access" {
@@ -26,25 +26,6 @@ variable "vpc_subnets" {
   type = list(string)
 }
 
-## Addons
-variable "enable_coredns" {
-  type        = bool
-  default     = false
-  description = "CoreDNS addon"
-}
-
-variable "enable_kube_proxy" {
-  type        = bool
-  default     = false
-  description = "Kube Proxy addon"
-}
-
-variable "enable_vpc_cni" {
-  type        = bool
-  default     = false
-  description = "VPC CNI addon"
-}
-
 variable "enable_aws_ebs_csi_driver" {
   type        = bool
   default     = false
@@ -63,7 +44,6 @@ variable "enable_external_dns" {
   description = "ExternalDNS addon"
 }
 
-## IRSA roles
 variable "create_aws_ebs_csi_driver_irsa_role" {
   type        = bool
   default     = false
@@ -98,20 +78,6 @@ variable "enable_karpenter" {
   description = "Karpenter"
 }
 
-variable "create_karpenter_service_account" {
-  type        = bool
-  default     = false
-  description = "Karpenter Service Account"
-}
-
-## Cluster roles
-variable "cluster_roles" {
-  type        = map(any)
-  default     = {}
-  description = "Map of cluster roles"
-}
-
-## KMS
 variable "kms_key_owners" {
   type        = list(string)
   default     = []
@@ -143,13 +109,6 @@ variable "eks_production_node_group" {
   description = "Map of EKS managed production node group definitions to create"
 }
 
-variable "eks_staging_node_group" {
-  type        = map(any)
-  default     = {}
-  description = "Map of EKS managed staging node group definitions to create"
-}
-
-## AWS Auth Configmap Roles
 variable "aws_auth_roles" {
   type        = list(any)
   default     = []
