@@ -172,8 +172,4 @@ module "iam_role_for_service_account" {
   }
 
   tags = merge(var.tags, lookup(each.value, "tags", {}))
-
-  depends_on = [
-    module.eks
-  ]
 }
